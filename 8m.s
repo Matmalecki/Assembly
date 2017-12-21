@@ -27,7 +27,8 @@ _start:
 	mov ecx, [ebp+8]
 
 	xor edx, edx
-	
+	push ebx
+
 petla_main:
 	cmp byte ptr [ebx], 0
 	je next
@@ -36,9 +37,9 @@ petla_main:
 	cmp al, ah
 	jne skok
 	inc ecx
-	mov eax, [esp]
+	mov eax, [esp+4]
 	cmp eax, ecx
-	jne k_p_main
+	jne pom
 	inc edx
 skok:
 	mov ecx, [ebp+8]
@@ -46,8 +47,15 @@ skok:
 	cmp al, ah
 	jne k_p_main
 	inc ecx
-k_p_main:
+	jmp k_p_main
+pom:
 	inc ebx
+	jmp petla_main
+
+k_p_main:
+	pop ebx
+	inc ebx
+	push ebx
 	jmp petla_main
 
 next:
