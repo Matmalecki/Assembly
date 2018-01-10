@@ -6,15 +6,60 @@
 
 main:
 	finit
+	mov ebp, esp
+
+	mov eax, [ebp+8]
+	mov ebx, [eax+4]
+	push ebx
+	call atof
+	add esp,4
+	fstp QWORD PTR x
+
+	mov ebp, esp
 	
+	mov eax, [ebp+8]
+	mov ebx, [eax+8]
+	push ebx
+	call atof
+	add esp,4
+	fstp QWORD PTR dokladnosc
+	
+
+	fld QWORD PTR rok
+	fld QWORD PTR wynik
+	faddp
+	fstp QWORD PTR wynik	
+
+
+	
+	fld QWORD PTR x
+	fstp QWORD PTR rok
+
+	fld QWORD PTR x
+	fld QWORD PTR x
+	faddp
+	fstp QWORD PTR x	
+
 
 	call sin
 
 	fld QWORD PTR wynik
 	fld QWORD PTR sin_value
-	faddp
+	fsubp
 	fstp QWORD PTR wynik
 
+	fld QWORD PTR rok
+	fstp QWORD PTR x
+	
+	fld QWORD PTR x
+	fld QWORD PTR x
+	fmulp
+	fstp QWORD PTR x
+
+	fld QWORD PTR rok
+	fld QWORD PTR x
+	fmulp
+	fstp QWORD PTR x	
 
 	call cos
 
@@ -37,10 +82,12 @@ main:
 	ret
 
 
+;// edx - k
+
 sin:
 	xor edx, edx
-	
 petla_sin:
+
 	fld1
 	fstp QWORD PTR silnia_value
 	
@@ -110,10 +157,11 @@ k_s:
 
 
 
+
 cos:
 	xor edx, edx
-	
 petla_cos:
+
 	fld1
 	fstp QWORD PTR silnia_value
 	
@@ -138,7 +186,7 @@ petla_cos:
 	
 	fld QWORD PTR pow_value
 	fld QWORD PTR silnia_value
-	fdivp
+	fdivrp
 	fstp QWORD PTR pom
 	
 	pop edx
@@ -150,8 +198,8 @@ petla_cos:
 	cmp eax, 1
 	jne skok_cos
 
-	fld QWORD PTR pom
 	fld QWORD PTR cos_value
+	fld QWORD PTR pom
 	faddp
 	fstp QWORD PTR cos_value
 	
@@ -241,7 +289,7 @@ k_pow:
 
 
 .data
-x:		.double 12
+x:		.double 2.3
 pow_value:	.double 1.0
 sin_value:	.double 0.0
 cos_value:	.double 0.0
@@ -251,4 +299,3 @@ silnia_value:	.double 1.0
 rok:		.double 2017
 pom:		.double 1.0
 napis: .asciz "Wynik: %.10lf\n"
-
