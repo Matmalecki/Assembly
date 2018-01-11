@@ -13,7 +13,7 @@ main:
 	push ebx
 	call atof
 	add esp,4
-	fstp QWORD PTR x
+	fstp QWORD PTR y
 
 	mov ebp, esp
 	
@@ -30,16 +30,15 @@ main:
 	faddp
 	fstp QWORD PTR wynik	
 
+	fld QWORD PTR y
+	fstp QWORD PTR x
 
-	
-	fld QWORD PTR x
-	fstp QWORD PTR rok
-
-	fld QWORD PTR x
-	fld QWORD PTR x
+	fld QWORD PTR y
+	fld QWORD PTR y
 	faddp
-	fstp QWORD PTR x	
+	fstp QWORD PTR x
 
+	call toTwoPi
 
 	call sin
 
@@ -48,18 +47,17 @@ main:
 	fsubp
 	fstp QWORD PTR wynik
 
-	fld QWORD PTR rok
-	fstp QWORD PTR x
-	
-	fld QWORD PTR x
-	fld QWORD PTR x
+	fld QWORD PTR y
+	fld QWORD PTR y
 	fmulp
 	fstp QWORD PTR x
 
-	fld QWORD PTR rok
 	fld QWORD PTR x
+	fld QWORD PTR y
 	fmulp
-	fstp QWORD PTR x	
+	fstp QWORD PTR x
+
+	call toTwoPi
 
 	call cos
 
@@ -86,8 +84,8 @@ main:
 
 sin:
 	xor edx, edx
+	
 petla_sin:
-
 	fld1
 	fstp QWORD PTR silnia_value
 	
@@ -155,13 +153,10 @@ k_s:
 	fstp QWORD PTR pom
 	ret
 
-
-
-
 cos:
 	xor edx, edx
+	
 petla_cos:
-
 	fld1
 	fstp QWORD PTR silnia_value
 	
@@ -186,7 +181,7 @@ petla_cos:
 	
 	fld QWORD PTR pow_value
 	fld QWORD PTR silnia_value
-	fdivrp
+	fdivp
 	fstp QWORD PTR pom
 	
 	pop edx
@@ -198,8 +193,8 @@ petla_cos:
 	cmp eax, 1
 	jne skok_cos
 
-	fld QWORD PTR cos_value
 	fld QWORD PTR pom
+	fld QWORD PTR cos_value
 	faddp
 	fstp QWORD PTR cos_value
 	
@@ -277,7 +272,7 @@ k_silnia:
 ;// przed wywolaniem musi byc w x arg, potega poprzez eax
 pow:	
 	cmp eax, 0
-	je k_pow 
+	jle k_pow 
 	fld QWORD PTR pow_value
 	fld QWORD PTR x
 	fmulp
@@ -288,14 +283,49 @@ k_pow:
 	ret
 
 
+toTwoPi:
+	fld QWORD PTR x
+	fld QWORD PTR dpi
+	
+	fcompp
+	fstsw
+	sahf
+
+	jnb o_t
+odejmuj:
+	fld QWORD PTR x
+	fld QWORD PTR dpi
+	fsubp
+	fstp QWORD PTR x
+	jmp toTwoPi
+o_t:
+	fld QWORD PTR x
+	fld QWORD PTR cos_value
+	
+	fcompp
+	fstsw
+	sahf
+
+	jbe d_t
+dodaj:
+	fld QWORD PTR x
+	fld QWORD PTR dpi
+	faddp
+	fstp QWORD PTR x
+	jmp o_t
+d_t:
+	ret
+
 .data
-x:		.double 2.3
+x:		.double 0.0
 pow_value:	.double 1.0
 sin_value:	.double 0.0
 cos_value:	.double 0.0
-dokladnosc:	.double 0.00001
+dokladnosc:	.double 0.0
 wynik:		.double 0.0
 silnia_value:	.double 1.0
 rok:		.double 2017
+y:		.double 0.0
+dpi:		.double 6.28318530718
 pom:		.double 1.0
 napis: .asciz "Wynik: %.10lf\n"
